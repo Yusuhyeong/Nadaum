@@ -1,10 +1,12 @@
 package com.bucketlist.nadaum.activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.bucketlist.nadaum.Nadaum
 import com.bucketlist.nadaum.databinding.ActivityLoginBinding
+import com.bucketlist.nadaum.network.FireStore
 import com.bucketlist.nadaum.utils.Constants
 import com.bucketlist.nadaum.utils.PersistentKVStore
 import com.bucketlist.nadaum.utils.SharedPrefsWrapper
@@ -17,6 +19,7 @@ class LoginActivity : AppCompatActivity() {
     private val TAG = this::class.java.simpleName
     private lateinit var binding: ActivityLoginBinding
     private val prefs: PersistentKVStore = SharedPrefsWrapper(Nadaum.mSharedPreferences)
+    private val firestore = FireStore()
 
     // kakao login callback
     private val kakaoCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
@@ -34,7 +37,17 @@ class LoginActivity : AppCompatActivity() {
                     val userId = user.id.toString()
                     Log.d(TAG, "uid : $userId")
 
-                    prefs.putString(Constants.PREF_USER, userId).commit()
+                    firestore.setUid(userId) { success ->
+                        if (success) {
+                            prefs.putString(Constants.PREF_USER, userId).commit()
+                            val intent = Intent(this, MainActivity::class.java)
+                            intent.putExtra("uid", userId)
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            Log.e(TAG, "UID 저장 실패")
+                        }
+                    }
                 }
             }
         }
@@ -77,7 +90,17 @@ class LoginActivity : AppCompatActivity() {
                             val userId = user.id.toString()
                             Log.d(TAG, "uid : $userId")
 
-                            prefs.putString(Constants.PREF_USER, userId).commit()
+                            firestore.setUid(userId) { success ->
+                                if (success) {
+                                    prefs.putString(Constants.PREF_USER, userId).commit()
+                                    val intent = Intent(this, MainActivity::class.java)
+                                    intent.putExtra("uid", userId)
+                                    startActivity(intent)
+                                    finish()
+                                } else {
+                                    Log.e(TAG, "UID 저장 실패")
+                                }
+                            }
                         }
                     }
                 }

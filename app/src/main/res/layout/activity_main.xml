@@ -8,7 +8,7 @@
         <import type="android.view.View" />
 
         <variable
-            name="home_view_model"
+            name="main_view_model"
             type="com.bucketlist.nadaum.viewmodel.MainViewModel" />
     </data>
 

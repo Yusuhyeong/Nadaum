@@ -56,6 +56,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-database:21.0.0")
     implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
+    implementation ("com.google.code.gson:gson:2.8.9")
 
     // kakao 로그인
     implementation ("com.kakao.sdk:v2-user:2.20.3")

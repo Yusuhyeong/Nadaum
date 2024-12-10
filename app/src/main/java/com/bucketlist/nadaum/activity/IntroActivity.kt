@@ -34,12 +34,6 @@ class IntroActivity : AppCompatActivity() {
                 }, 2000)
             } else { // 사용자 정보 있음 (자동 로그인)
                 Log.d(TAG, "User Info : $userUuid")
-                // userInfo load
-
-                // userInfo putExtra
-
-                // intent to MainActivity
-                // 2000 sleep
                 // start MainActivity
                 Handler().postDelayed(Runnable {
                     val mainIntent = Intent(this, MainActivity::class.java)

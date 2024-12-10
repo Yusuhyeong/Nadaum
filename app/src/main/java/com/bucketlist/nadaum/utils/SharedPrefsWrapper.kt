@@ -1,13 +1,10 @@
 package com.bucketlist.nadaum.utils
 
 import android.content.SharedPreferences
-import android.util.Log
 
 class SharedPrefsWrapper(
     val appCache: SharedPreferences
 ) : PersistentKVStore {
-    private val TAG = this::class.java.simpleName
-
     override fun remove(key: String): PersistentKVStore {
         editor.remove(key)
         return this
