@@ -13,10 +13,8 @@ class FireStore {
 
     fun setUid(uid: String, callback: (Boolean) -> Unit) {
         Log.d(TAG, "uid 추가, 추가 uid : $uid")
-
         val userRef = firestore.collection("user").document(uid)
-
-        val emptyData = mapOf<String, Any>() // 빈 Map
+        val emptyData = listOf<Any>()
 
         userRef.set(mapOf("bucketList" to emptyData))
             .addOnSuccessListener {
@@ -32,23 +30,41 @@ class FireStore {
     fun saveBucketList(uid: String, date: String, bucketList: List<BucketList>, callback: (Boolean) -> Unit) {
         val userDoc = firestore.collection("user").document(uid)
 
-        val bucketListData = bucketList.map { bucket ->
-            mapOf(bucket.todo to bucket.isTodo)
+        val bucketListData = bucketList.associate { bucket ->
+            bucket.todo to bucket.isTodo
         }
 
-        val data = mapOf("bucketList.$date" to bucketListData)
+        userDoc.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val bucketListJson = document.getString("bucketList") ?: "[]"
 
-        userDoc.update(data)
-            .addOnSuccessListener {
-                Log.d(TAG, "Success, save bucketList")
-                callback(true)
-            }
-            .addOnFailureListener { e ->
-                Log.d(TAG, "Fail, save bucketList")
+                val bucketListMap: List<Map<String, Map<String, Boolean>>> = Gson().fromJson(
+                    bucketListJson,
+                    object : TypeToken<List<Map<String, Map<String, Boolean>>>>() {}.type
+                )
+
+                val updatedBucketList = bucketListMap.toMutableList()
+
+                updatedBucketList.add(mapOf(date to bucketListData))
+
+                userDoc.update("bucketList", updatedBucketList)
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Success, added new date to bucketList")
+                        callback(true)
+                    }
+                    .addOnFailureListener { e ->
+                        Log.d(TAG, "Fail : $e")
+                        callback(false)
+                    }
+            } else {
+                Log.d(TAG, "Fail, no document")
                 callback(false)
             }
+        }.addOnFailureListener { e ->
+            Log.d(TAG, "Error : $e")
+            callback(false)
+        }
     }
-
 
     fun getBucketList(uid: String, callback: (List<BaseBucketList>?) -> Unit) {
         val userDoc = firestore.collection("user").document(uid)

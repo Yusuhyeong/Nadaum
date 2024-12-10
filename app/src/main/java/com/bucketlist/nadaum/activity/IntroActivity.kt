@@ -37,6 +37,7 @@ class IntroActivity : AppCompatActivity() {
                 // start MainActivity
                 Handler().postDelayed(Runnable {
                     val mainIntent = Intent(this, MainActivity::class.java)
+                    mainIntent.putExtra("uid", userUuid)
                     startActivity(mainIntent)
                     finish()
                 }, 2000)
